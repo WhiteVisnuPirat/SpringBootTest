@@ -1,11 +1,36 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <title>Spring Security Example</title>
+    <title>User Panel</title>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .user-info { background: #f0f0f0; padding: 20px; border-radius: 5px; }
+        .logout-btn { background: #ff4444; color: white; padding: 10px; border: none; border-radius: 3px; }
+    </style>
 </head>
 <body>
-<h1>User, welcome spring boot security page!</h1>
+<h1>👤 User Panel</h1>
 
+<div class="user-info">
+    <h2>Your Information:</h2>
+    <p><strong>Username:</strong> <span th:text="${user.username}"></span></p>
+    <p><strong>First Name:</strong> <span th:text="${user.firstname}"></span></p>
+    <p><strong>Last Name:</strong> <span th:text="${user.lastname}"></span></p>
+    <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+    <p><strong>Age:</strong> <span th:text="${user.age}"></span></p>
+    <p><strong>Roles:</strong> <span th:text="${user.roles}"></span></p>
+</div>
 
+<div sec:authorize="hasRole('ADMIN')">
+    <p><a th:href="@{/admin}">↗ Go to Admin Panel</a></p>
+</div>
+
+<p><a th:href="@{/}">← Back to Home</a></p>
+
+<form th:action="@{/logout}" method="post">
+    <input type="submit" value="Logout" class="logout-btn"/>
+</form>
 </body>
 </html>
