@@ -1,10 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
+  <title>Edit User</title>
   <meta charset="UTF-8">
-  <title>$Title$</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    .form-group { margin: 10px 0; }
+    input, select { padding: 8px; margin: 5px 0; width: 300px; }
+    button { background: #4CAF50; color: white; padding: 10px; border: none; cursor: pointer; }
+    .btn-back { background: #888; color: white; padding: 10px; text-decoration: none; display: inline-block; margin-right: 10px; }
+  </style>
 </head>
 <body>
-$END$
+<h1>✏️ Edit User</h1>
+
+<form th:action="@{/admin/updateUser}" method="post">
+  <input type="hidden" name="id" th:value="${user.id}">
+
+  <div class="form-group">
+    <label>Username:</label><br>
+    <input type="text" name="username" th:value="${user.username}" required>
+  </div>
+
+  <div class="form-group">
+    <label>Password:</label><br>
+    <input type="password" name="password" placeholder="Leave blank to keep current password">
+  </div>
+
+  <div class="form-group">
+    <label>First Name:</label><br>
+    <input type="text" name="firstname" th:value="${user.firstname}" required>
+  </div>
+
+  <div class="form-group">
+    <label>Last Name:</label><br>
+    <input type="text" name="lastname" th:value="${user.lastname}" required>
+  </div>
+
+  <div class="form-group">
+    <label>Email:</label><br>
+    <input type="email" name="email" th:value="${user.email}" required>
+  </div>
+
+  <div class="form-group">
+    <label>Age:</label><br>
+    <input type="number" name="age" th:value="${user.age}" min="1">
+  </div>
+
+  <div class="form-group">
+    <label>Roles:</label><br>
+    <div th:each="role : ${allRoles}">
+      <input type="checkbox" name="roleIds" th:value="${role.id}"
+             th:checked="${user.roles.contains(role)}">
+      <label th:text="${role.name}"></label>
+    </div>
+  </div>
+
+  <button type="submit">Update User</button>
+</form>
+
+<br>
+<a th:href="@{/admin}" class="btn-back">← Back to Admin Panel</a>
 </body>
 </html>

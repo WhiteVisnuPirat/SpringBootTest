@@ -52,7 +52,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void updateUser(User user) {
-        if (!user.getPassword().startsWith("$2a$")) {
+        User existingUser = userDao.findById(user.getId());
+        if (existingUser != null && !passwordEncoder.matches(user.getPassword(), existingUser.getPassword())) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        } else if (existingUser == null) {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
         userDao.update(user);
