@@ -3,60 +3,89 @@
 <head>
   <title>Add User</title>
   <meta charset="UTF-8">
-  <style>
-    body { font-family: Arial, sans-serif; margin: 40px; }
-    .form-group { margin: 10px 0; }
-    input, select { padding: 8px; margin: 5px 0; width: 300px; }
-    button { background: #4CAF50; color: white; padding: 10px; border: none; cursor: pointer; }
-    .btn-back { background: #888; color: white; padding: 10px; text-decoration: none; display: inline-block; margin-right: 10px; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/webjars/bootstrap/5.3.0/css/bootstrap.min.css">
 </head>
 <body>
-<h1>➕ Add New User</h1>
-
-<form th:action="@{/admin/createUser}" method="post">
-  <div class="form-group">
-    <label>Username:</label><br>
-    <input type="text" name="username" required>
-  </div>
-
-  <div class="form-group">
-    <label>Password:</label><br>
-    <input type="password" name="password" required>
-  </div>
-
-  <div class="form-group">
-    <label>First Name:</label><br>
-    <input type="text" name="firstname" required>
-  </div>
-
-  <div class="form-group">
-    <label>Last Name:</label><br>
-    <input type="text" name="lastname" required>
-  </div>
-
-  <div class="form-group">
-    <label>Email:</label><br>
-    <input type="email" name="email" required>
-  </div>
-
-  <div class="form-group">
-    <label>Age:</label><br>
-    <input type="number" name="age" min="1">
-  </div>
-
-  <div class="form-group">
-    <label>Roles:</label><br>
-    <div th:each="role : ${allRoles}">
-      <input type="checkbox" name="roleIds" th:value="${role.id}">
-      <label th:text="${role.name}"></label>
+<!-- Навигационная панель -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand" th:href="@{/}">Spring Security Demo</a>
+    <div class="navbar-nav ms-auto">
+      <a class="nav-link" th:href="@{/admin}">Admin Panel</a>
+      <a class="nav-link" th:href="@{/}">Home</a>
+      <form th:action="@{/logout}" method="post" class="d-inline">
+        <button type="submit" class="btn btn-link nav-link">Logout</button>
+      </form>
     </div>
   </div>
+</nav>
 
-  <button type="submit">Create User</button>
-</form>
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">➕ Add New User</h2>
+        </div>
+        <div class="card-body">
+          <form th:action="@{/admin/createUser}" method="post">
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+              </div>
+              <div class="col-md-6">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+              </div>
+            </div>
 
-<br>
-<a th:href="@{/admin}" class="btn-back">← Back to Admin Panel</a>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="firstname" class="form-label">First Name</label>
+                <input type="text" class="form-control" id="firstname" name="firstname" required>
+              </div>
+              <div class="col-md-6">
+                <label for="lastname" class="form-label">Last Name</label>
+                <input type="text" class="form-control" id="lastname" name="lastname" required>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+              </div>
+              <div class="col-md-6">
+                <label for="age" class="form-label">Age</label>
+                <input type="number" class="form-control" id="age" name="age" min="1">
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Roles</label>
+              <div class="row">
+                <div th:each="role : ${allRoles}" class="col-md-4">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="roleIds" th:value="${role.id}" id="role-${role.id}">
+                    <label class="form-check-label" th:for="'role-' + ${role.id}" th:text="${role.name}"></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+              <a th:href="@{/admin}" class="btn btn-secondary me-md-2">Cancel</a>
+              <button type="submit" class="btn btn-primary">Create User</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
