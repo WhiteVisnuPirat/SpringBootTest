@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.dao.RoleDao;
 import ru.kata.spring.boot_security.demo.model.Role;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -58,4 +59,15 @@ public class RoleServiceImpl implements RoleService{
         Role userRole = roleDao.findByName("ROLE_USER");
         return Set.of(userRole);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Long> getRoleIdsByNames(List<String> roleNames) {
+        return roleNames.stream()
+                .map(roleDao::findByName)
+                .filter(Objects::nonNull)
+                .map(Role::getId)
+                .collect(Collectors.toList());
+    }
 }
+

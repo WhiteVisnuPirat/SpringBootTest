@@ -1,58 +1,71 @@
 package ru.kata.spring.boot_security.demo.controller;
 
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
+import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/api")
 public class UserRestController {
 
     private final UserService userService;
+    private final RoleService roleService;
 
-    public UserRestController(UserService userService) {
+    public UserRestController(UserService userService, RoleService roleService) {
         this.userService = userService;
+        this.roleService = roleService;
     }
 
-    @GetMapping("/users")
+    // Эндпоинты для админа
+    @GetMapping("/admin/users")
     public ResponseEntity<List<User>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-    @GetMapping("/users/{id}")
+    @GetMapping("/admin/users/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         User user = userService.getUserById(id);
         return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
     }
 
-    @PostMapping("/users")
-    public ResponseEntity<User> createUser(@RequestBody User user) {
+    @PostMapping("/admin/users")
+    public ResponseEntity<User> createUser(@RequestBody User user,
+                                           @RequestParam List<Long> roleIds) {
+        Set<Role> roles = roleService.getRolesByIds(roleIds);
+        user.setRoles(roles);
         userService.saveUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
-    @PutMapping("/users/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
+    @PutMapping("/admin/users/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable Long id,
+                                           @RequestBody User user,
+                                           @RequestParam List<Long> roleIds) {
+        Set<Role> roles = roleService.getRolesByIds(roleIds);
+        user.setRoles(roles);
         user.setId(id);
         userService.updateUser(user);
         return ResponseEntity.ok(user);
     }
 
-    @DeleteMapping("/users/{id}")
+    @DeleteMapping("/admin/users/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.ok().build();
+    }
+
+
+    // Эндпоинт для страницы пользователя
+    @GetMapping("/user/profile")
+    public ResponseEntity<User> getUserProfile(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(user);
     }
 }

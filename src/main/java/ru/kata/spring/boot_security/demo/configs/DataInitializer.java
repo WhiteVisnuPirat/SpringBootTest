@@ -2,12 +2,14 @@ package ru.kata.spring.boot_security.demo.configs;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 import java.util.Set;
 
 @Component
@@ -25,26 +27,40 @@ public class DataInitializer {
 
     @PostConstruct
     public void init() {
-        // Проверяем, есть ли уже данные в базе
-        if (roleService.getAllRoles().isEmpty()) {
+        // Сначала создаем роли, если их нет
+        createRolesIfNotExist();
 
-            // Создание ролей
+        // Затем создаем пользователей, если их нет
+        createUsersIfNotExist();
+    }
+
+    private void createRolesIfNotExist() {
+        if (roleService.getAllRoles().isEmpty()) {
             Role adminRole = new Role("ROLE_ADMIN");
             Role userRole = new Role("ROLE_USER");
             roleService.saveRole(adminRole);
             roleService.saveRole(userRole);
+        }
+    }
 
-            // ТЕСТ: Проверяем кодирование паролей
-            String testPassword = "admin";
-            String encodedPassword = passwordEncoder.encode(testPassword);
-            System.out.println("=== DEBUG: Raw password: " + testPassword + " ===");
-            System.out.println("=== DEBUG: Encoded password: " + encodedPassword + " ===");
-            System.out.println("=== DEBUG: Matches: " + passwordEncoder.matches(testPassword, encodedPassword) + " ===");
+    private void createUsersIfNotExist() {
+        if (userService.getAllUsers().isEmpty()) {
+            // Получаем роли напрямую из базы
+            List<Role> allRoles = roleService.getAllRoles();
+            Role adminRole = allRoles.stream()
+                    .filter(role -> "ROLE_ADMIN".equals(role.getName()))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("ROLE_ADMIN not found"));
+
+            Role userRole = allRoles.stream()
+                    .filter(role -> "ROLE_USER".equals(role.getName()))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("ROLE_USER not found"));
 
             // Создание администратора
             User admin = new User();
             admin.setUsername("admin");
-            admin.setPassword("admin"); // UserService закодирует этот пароль
+            admin.setPassword("admin");
             admin.setFirstname("Admin");
             admin.setLastname("Adminov");
             admin.setEmail("admin@mail.ru");
@@ -55,7 +71,7 @@ public class DataInitializer {
             // Создание обычного пользователя
             User user = new User();
             user.setUsername("user");
-            user.setPassword("user"); // UserService закодирует этот пароль
+            user.setPassword("user");
             user.setFirstname("User");
             user.setLastname("Userov");
             user.setEmail("user@mail.ru");

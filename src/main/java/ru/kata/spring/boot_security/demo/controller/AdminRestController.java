@@ -10,16 +10,16 @@ import ru.kata.spring.boot_security.demo.service.RoleService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/roles")
-public class RoleRestController {
+@RequestMapping("/api/admin")
+public class AdminRestController {
 
     private final RoleService roleService;
 
-    public RoleRestController(RoleService roleService) {
+    public AdminRestController(RoleService roleService) {
         this.roleService = roleService;
     }
 
-    @GetMapping
+    @GetMapping("/roles")
     public ResponseEntity<List<Role>> getAllRoles() {
         return ResponseEntity.ok(roleService.getAllRoles());
     }

@@ -14,19 +14,23 @@ class UserManager {
     async loadUsers() {
         try {
             const response = await fetch('/api/admin/users');
+            if (!response.ok) throw new Error('Failed to load users');
             this.users = await response.json();
             this.renderUsersTable();
         } catch (error) {
             console.error('Error loading users:', error);
+            this.showAlert('Error loading users!', 'danger');
         }
     }
 
     async loadRoles() {
         try {
-            const response = await fetch('/api/roles');
+            const response = await fetch('/api/admin/roles');
+            if (!response.ok) throw new Error('Failed to load roles');
             this.roles = await response.json();
         } catch (error) {
             console.error('Error loading roles:', error);
+            this.showAlert('Error loading roles!', 'danger');
         }
     }
 
@@ -72,18 +76,15 @@ class UserManager {
     }
 
     setupEventListeners() {
-        // Add new user button
         document.getElementById('addUserBtn').addEventListener('click', () => {
             this.openAddModal();
         });
 
-        // Save user form
         document.getElementById('userForm').addEventListener('submit', (e) => {
             e.preventDefault();
             this.saveUser();
         });
 
-        // Close modal
         document.querySelectorAll('[data-bs-dismiss="modal"]').forEach(btn => {
             btn.addEventListener('click', () => {
                 this.closeModal();
@@ -100,6 +101,7 @@ class UserManager {
         document.getElementById('lastname').value = '';
         document.getElementById('email').value = '';
         document.getElementById('age').value = '';
+        document.getElementById('password').value = '';
         document.getElementById('password').required = true;
 
         this.renderRoleCheckboxes(null);
@@ -118,7 +120,9 @@ class UserManager {
         document.getElementById('lastname').value = user.lastname;
         document.getElementById('email').value = user.email;
         document.getElementById('age').value = user.age;
+        document.getElementById('password').value = '';
         document.getElementById('password').required = false;
+        document.getElementById('password').placeholder = 'Leave empty to keep current password';
 
         this.renderRoleCheckboxes(user);
         modal.show();
@@ -148,21 +152,37 @@ class UserManager {
         const formData = new FormData(document.getElementById('userForm'));
         const userId = document.getElementById('userId').value;
 
+        // Валидация
+        const username = formData.get('username');
+        const firstname = formData.get('firstname');
+        const lastname = formData.get('lastname');
+        const email = formData.get('email');
+        const age = formData.get('age');
+
+        if (!username || !firstname || !lastname || !email || !age) {
+            this.showAlert('Please fill all required fields!', 'warning');
+            return;
+        }
+
         const userData = {
-            username: formData.get('username'),
-            firstname: formData.get('firstname'),
-            lastname: formData.get('lastname'),
-            email: formData.get('email'),
-            age: parseInt(formData.get('age')),
-            password: formData.get('password') || '',
-            roles: this.getSelectedRoles()
+            username: username,
+            firstname: firstname,
+            lastname: lastname,
+            email: email,
+            age: parseInt(age),
+            password: formData.get('password') || ''
         };
+
+        const roleIds = this.getSelectedRoleIds();
+        const roleParams = this.buildRoleParams(roleIds);
 
         try {
             let response;
+            let url;
+
             if (userId) {
-                // Update existing user
-                response = await fetch(`/api/admin/users/${userId}`, {
+                url = `/api/admin/users/${userId}${roleParams ? '?' + roleParams : ''}`;
+                response = await fetch(url, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -170,8 +190,8 @@ class UserManager {
                     body: JSON.stringify(userData)
                 });
             } else {
-                // Create new user
-                response = await fetch('/api/admin/users', {
+                url = `/api/admin/users${roleParams ? '?' + roleParams : ''}`;
+                response = await fetch(url, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -185,23 +205,26 @@ class UserManager {
                 await this.loadUsers();
                 this.showAlert('User saved successfully!', 'success');
             } else {
-                throw new Error('Failed to save user');
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to save user');
             }
         } catch (error) {
             console.error('Error saving user:', error);
-            this.showAlert('Error saving user!', 'danger');
+            this.showAlert(error.message || 'Error saving user!', 'danger');
         }
     }
 
-    getSelectedRoles() {
-        const selectedRoles = [];
+    getSelectedRoleIds() {
+        const selectedRoleIds = [];
         document.querySelectorAll('#userRoles input:checked').forEach(checkbox => {
-            selectedRoles.push({
-                id: parseInt(checkbox.value),
-                name: this.roles.find(r => r.id == checkbox.value).name
-            });
+            selectedRoleIds.push(parseInt(checkbox.value));
         });
-        return selectedRoles;
+        return selectedRoleIds;
+    }
+
+    buildRoleParams(roleIds) {
+        if (roleIds.length === 0) return '';
+        return roleIds.map(id => `roleIds=${id}`).join('&');
     }
 
     async deleteUser(userId) {
@@ -218,17 +241,20 @@ class UserManager {
                 await this.loadUsers();
                 this.showAlert('User deleted successfully!', 'success');
             } else {
-                throw new Error('Failed to delete user');
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to delete user');
             }
         } catch (error) {
             console.error('Error deleting user:', error);
-            this.showAlert('Error deleting user!', 'danger');
+            this.showAlert(error.message || 'Error deleting user!', 'danger');
         }
     }
 
     closeModal() {
         const modal = bootstrap.Modal.getInstance(document.getElementById('userModal'));
-        modal.hide();
+        if (modal) {
+            modal.hide();
+        }
     }
 
     showAlert(message, type) {
@@ -243,8 +269,10 @@ class UserManager {
         container.insertBefore(alertDiv, container.firstChild);
 
         setTimeout(() => {
-            alertDiv.remove();
-        }, 3000);
+            if (alertDiv.parentNode) {
+                alertDiv.remove();
+            }
+        }, 5000);
     }
 }
 
