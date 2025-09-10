@@ -17,23 +17,23 @@ public class Role implements GrantedAuthority {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long ig;
 
     @Column(name = "name", unique = true, nullable = false)
     private String name;
 
-    public Role() {}
+    public Role(){}
 
-    public Role(String name) {
+    public Role(String name){
         this.name = name;
     }
 
-    public Long getId() {
-        return id;
+    public long getIg() {
+        return ig;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setIg(long ig) {
+        this.ig = ig;
     }
 
     public String getName() {
@@ -54,18 +54,18 @@ public class Role implements GrantedAuthority {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Role role = (Role) o;
-        return Objects.equals(id, role.id) && Objects.equals(name, role.name);
+        return ig == role.ig && Objects.equals(name, role.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name);
+        return Objects.hash(ig, name);
     }
 
     @Override
     public String toString() {
         return "Role{" +
-                "id=" + id +
+                "ig=" + ig +
                 ", name='" + name + '\'' +
                 '}';
     }

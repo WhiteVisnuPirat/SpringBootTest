@@ -1,46 +1,44 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>Please sign in</title>
+  <title>Login Page</title>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="/webjars/bootstrap/5.3.0/css/bootstrap.min.css">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    .login-form { max-width: 300px; margin: 0 auto; }
+    .form-group { margin: 10px 0; }
+    input[type="text"], input[type="password"] {
+      width: 100%; padding: 8px; margin: 5px 0;
+    }
+    button { background: #4CAF50; color: white; padding: 10px; border: none; width: 100%; }
+    .error { color: red; }
+  </style>
 </head>
-<body class="bg-light">
-<div class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-md-6 col-lg-4">
-      <div class="card shadow">
-        <div class="card-body p-5">
-          <h2 class="card-title text-center mb-4">Please sign in</h2>
+<body>
+<h1>🔐 Login</h1>
 
-          <div th:if="${param.error}" class="alert alert-danger" role="alert">
-            Invalid username or password!
-          </div>
-
-          <div th:if="${param.logout}" class="alert alert-success" role="alert">
-            You have been logged out.
-          </div>
-
-          <form th:action="@{/login}" method="post">
-            <div class="mb-3">
-              <label for="username" class="form-label">Username</label>
-              <input type="text" class="form-control" id="username" name="username" required>
-            </div>
-
-            <div class="mb-3">
-              <label for="password" class="form-label">Password</label>
-              <input type="password" class="form-control" id="password" name="password" required>
-            </div>
-
-            <button type="submit" class="btn btn-primary w-100">Sign in</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
+<div th:if="${param.error}" class="error">
+  Invalid username or password!
 </div>
 
-<script src="/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<div th:if="${param.logout}" class="success">
+  You have been logged out.
+</div>
+
+<form th:action="@{/login}" method="post" class="login-form">
+  <div class="form-group">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required/>
+  </div>
+
+  <div class="form-group">
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required/>
+  </div>
+
+  <button type="submit">Login</button>
+</form>
+
+<p><a th:href="@{/}">← Back to Home</a></p>
 </body>
 </html>

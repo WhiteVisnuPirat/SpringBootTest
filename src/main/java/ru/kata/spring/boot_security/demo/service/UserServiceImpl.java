@@ -46,8 +46,6 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void saveUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        System.out.println("=== DEBUG: Encoding password for user: " + user.getUsername() + " ===");
-        System.out.println("=== DEBUG: Encoded password: " + user.getPassword() + " ===");
         userDao.save(user);
     }
 
@@ -55,16 +53,9 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void updateUser(User user) {
         User existingUser = userDao.findById(user.getId());
-        if (existingUser != null) {
-            // Если пароль не указан, сохраняем старый пароль
-            if (user.getPassword() == null || user.getPassword().isEmpty()) {
-                user.setPassword(existingUser.getPassword());
-            } else {
-                // Если указан новый пароль, кодируем его
-                user.setPassword(passwordEncoder.encode(user.getPassword()));
-            }
-        } else {
-            // Для нового пользователя (хотя это не должно происходить здесь)
+        if (existingUser != null && !passwordEncoder.matches(user.getPassword(), existingUser.getPassword())) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        } else if (existingUser == null) {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
         userDao.update(user);

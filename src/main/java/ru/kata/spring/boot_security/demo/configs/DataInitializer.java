@@ -34,17 +34,10 @@ public class DataInitializer {
             roleService.saveRole(adminRole);
             roleService.saveRole(userRole);
 
-            // ТЕСТ: Проверяем кодирование паролей
-            String testPassword = "admin";
-            String encodedPassword = passwordEncoder.encode(testPassword);
-            System.out.println("=== DEBUG: Raw password: " + testPassword + " ===");
-            System.out.println("=== DEBUG: Encoded password: " + encodedPassword + " ===");
-            System.out.println("=== DEBUG: Matches: " + passwordEncoder.matches(testPassword, encodedPassword) + " ===");
-
             // Создание администратора
             User admin = new User();
             admin.setUsername("admin");
-            admin.setPassword("admin"); // UserService закодирует этот пароль
+            admin.setPassword(passwordEncoder.encode("admin")); // Кодируем пароль!
             admin.setFirstname("Admin");
             admin.setLastname("Adminov");
             admin.setEmail("admin@mail.ru");
@@ -55,7 +48,7 @@ public class DataInitializer {
             // Создание обычного пользователя
             User user = new User();
             user.setUsername("user");
-            user.setPassword("user"); // UserService закодирует этот пароль
+            user.setPassword(passwordEncoder.encode("user")); // Кодируем пароль!
             user.setFirstname("User");
             user.setLastname("Userov");
             user.setEmail("user@mail.ru");

@@ -4,80 +4,33 @@
 <head>
     <title>User Panel</title>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/webjars/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .user-info { background: #f0f0f0; padding: 20px; border-radius: 5px; }
+        .logout-btn { background: #ff4444; color: white; padding: 10px; border: none; border-radius: 3px; }
+    </style>
 </head>
 <body>
-<!-- Навигационная панель -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-        <a class="navbar-brand" th:href="@{/}">Spring Security Demo</a>
-        <div class="navbar-nav ms-auto">
-            <span class="navbar-text me-3" th:text="${#authentication.name} + ' with roles: ' + ${#authentication.authorities}"></span>
-            <a class="nav-link" th:href="@{/}">Home</a>
-            <form th:action="@{/logout}" method="post" class="d-inline">
-                <button type="submit" class="btn btn-link nav-link">Logout</button>
-            </form>
-        </div>
-    </div>
-</nav>
+<h1>👤 User Panel</h1>
 
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">👤 User Information</h2>
-                </div>
-                <div class="card-body">
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <strong>Username:</strong>
-                            <p th:text="${user.username}" class="form-control-plaintext"></p>
-                        </div>
-                        <div class="col-md-6">
-                            <strong>Email:</strong>
-                            <p th:text="${user.email}" class="form-control-plaintext"></p>
-                        </div>
-                    </div>
-
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <strong>First Name:</strong>
-                            <p th:text="${user.firstname}" class="form-control-plaintext"></p>
-                        </div>
-                        <div class="col-md-6">
-                            <strong>Last Name:</strong>
-                            <p th:text="${user.lastname}" class="form-control-plaintext"></p>
-                        </div>
-                    </div>
-
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <strong>Age:</strong>
-                            <p th:text="${user.age}" class="form-control-plaintext"></p>
-                        </div>
-                        <div class="col-md-6">
-                            <strong>Roles:</strong>
-                            <p>
-                                <span th:each="role : ${user.roles}" class="badge bg-secondary me-1" th:text="${role.name}"></span>
-                            </p>
-                        </div>
-                    </div>
-
-                    <div sec:authorize="hasRole('ADMIN')" class="mt-4">
-                        <a th:href="@{/admin}" class="btn btn-primary">Go to Admin Panel</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-3">
-                <a th:href="@{/}" class="btn btn-outline-secondary">← Back to Home</a>
-            </div>
-        </div>
-    </div>
+<div class="user-info">
+    <h2>Your Information:</h2>
+    <p><strong>Username:</strong> <span th:text="${user.username}"></span></p>
+    <p><strong>First Name:</strong> <span th:text="${user.firstname}"></span></p>
+    <p><strong>Last Name:</strong> <span th:text="${user.lastname}"></span></p>
+    <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+    <p><strong>Age:</strong> <span th:text="${user.age}"></span></p>
+    <p><strong>Roles:</strong> <span th:text="${user.roles}"></span></p>
 </div>
 
-<script src="/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<div sec:authorize="hasRole('ADMIN')">
+    <p><a th:href="@{/admin}">↗ Go to Admin Panel</a></p>
+</div>
+
+<p><a th:href="@{/}">← Back to Home</a></p>
+
+<form th:action="@{/logout}" method="post">
+    <input type="submit" value="Logout" class="logout-btn"/>
+</form>
 </body>
 </html>
