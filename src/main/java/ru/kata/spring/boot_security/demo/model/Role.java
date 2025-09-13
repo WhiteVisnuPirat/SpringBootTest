@@ -17,7 +17,7 @@ public class Role implements GrantedAuthority {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long ig;
+    private long id;
 
     @Column(name = "name", unique = true, nullable = false)
     private String name;
@@ -28,12 +28,12 @@ public class Role implements GrantedAuthority {
         this.name = name;
     }
 
-    public long getIg() {
-        return ig;
+    public long getId() {
+        return id;
     }
 
-    public void setIg(long ig) {
-        this.ig = ig;
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -54,18 +54,18 @@ public class Role implements GrantedAuthority {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Role role = (Role) o;
-        return ig == role.ig && Objects.equals(name, role.name);
+        return id == role.id && Objects.equals(name, role.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(ig, name);
+        return Objects.hash(id, name);
     }
 
     @Override
     public String toString() {
         return "Role{" +
-                "ig=" + ig +
+                "id=" + id +
                 ", name='" + name + '\'' +
                 '}';
     }

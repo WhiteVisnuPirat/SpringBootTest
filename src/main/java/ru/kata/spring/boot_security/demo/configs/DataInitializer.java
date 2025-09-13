@@ -37,7 +37,7 @@ public class DataInitializer {
             // Создание администратора
             User admin = new User();
             admin.setUsername("admin");
-            admin.setPassword(passwordEncoder.encode("admin")); // Кодируем пароль!
+            admin.setPassword("admin"); // Кодируем пароль!
             admin.setFirstname("Admin");
             admin.setLastname("Adminov");
             admin.setEmail("admin@mail.ru");
@@ -48,7 +48,7 @@ public class DataInitializer {
             // Создание обычного пользователя
             User user = new User();
             user.setUsername("user");
-            user.setPassword(passwordEncoder.encode("user")); // Кодируем пароль!
+            user.setPassword("user"); // Кодируем пароль!
             user.setFirstname("User");
             user.setLastname("Userov");
             user.setEmail("user@mail.ru");

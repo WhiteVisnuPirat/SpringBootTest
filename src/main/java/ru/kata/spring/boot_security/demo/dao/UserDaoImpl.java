@@ -10,26 +10,34 @@ import java.util.List;
 
 
 @Repository
+@Transactional(readOnly = true)
 public class UserDaoImpl implements UserDao {
 
     @PersistenceContext
     private EntityManager entityManager;
 
     @Override
+    @Transactional(readOnly = true)
     public List<User> findAll() {
-        TypedQuery<User> query = entityManager.createQuery("FROM User", User.class);
+        TypedQuery<User> query = entityManager.createQuery(
+                "SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.roles", User.class);
         return query.getResultList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public User findById(Long id) {
-        return entityManager.find(User.class, id);
+        TypedQuery<User> query = entityManager.createQuery(
+                "SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.roles WHERE u.id = :id", User.class);
+        query.setParameter("id", id);
+        return query.getResultList().stream().findFirst().orElse(null);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public User findByUsername(String username) {
         TypedQuery<User> query = entityManager.createQuery(
-                "FROM User WHERE username = :username", User.class);
+                "SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.roles WHERE u.username = :username", User.class);
         query.setParameter("username", username);
         return query.getResultList().stream().findFirst().orElse(null);
     }
